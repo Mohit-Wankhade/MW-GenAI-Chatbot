@@ -33,6 +33,19 @@ jobs:
           pip install -r requirements.txt
 
       - name: Verify Backend Imports
+        env:
+          MONGO_URL: ${{ secrets.MONGO_URL }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          REDIS_DB: 0
+        run: |
+          python - <<EOF
+          import os
+          print("Mongo exists:", os.getenv("MONGO_URL") is not None)
+          print("Mongo length:", len(os.getenv("MONGO_URL","")))
+          print("Starts with:", os.getenv("MONGO_URL","")[:15])
+          EOF
         run: |
           python -c "import app"
 
