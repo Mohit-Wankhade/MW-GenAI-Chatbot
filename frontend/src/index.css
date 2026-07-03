@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================
+   Global Theme
+============================ */
+
+html,
+body,
+#root {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    background: #202123;
+    color: #F3F4F6;
+
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* ============================
+   Scrollbars
+============================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 999px;
+    transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #C8A97E;
+}
+
+/* Firefox */
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #555 transparent;
+}
+
+/* ============================
+   Selection
+============================ */
+
+::selection {
+    background: rgba(200, 169, 126, 0.35);
+    color: white;
+}
+
+/* ============================
+   Smooth animations
+============================ */
+
+button,
+input,
+textarea,
+a {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* ============================
+   Focus
+============================ */
+
+input:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
+/* ============================
+   Markdown Typography
+============================ */
+
+.prose {
+    color: #ECECEC;
+}
+
+.prose strong {
+    color: #FFFFFF;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+    color: white;
+    margin-top: 1.25rem;
+    margin-bottom: .75rem;
+}
+
+.prose code:not(pre code) {
+    background: #343541;
+    color: #F3F4F6;
+    padding: .15rem .4rem;
+    border-radius: .35rem;
+    font-size: .9em;
+}
+
+.prose pre {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+/* ============================
+   Utility
+============================ */
+
+.glass {
+    background: rgba(255,255,255,.03);
+    backdrop-filter: blur(12px);
+}
+
+.card {
+    border: 1px solid rgba(255,255,255,.08);
+    background: #2B2D31;
+    border-radius: 16px;
+}
+
+.card-hover:hover {
+    border-color: #C8A97E;
+    transform: translateY(-2px);
+}
+
+.accent {
+    color: #C8A97E;
+}
+
+.accent-bg {
+    background: #C8A97E;
+}
+
+.accent-hover:hover {
+    background: #B7946A;
+}
