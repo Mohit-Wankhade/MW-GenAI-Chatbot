@@ -21,3 +21,4 @@ REDIS_DB = int(os.getenv("REDIS_DB", "0"))
 
 SECRET_KEY = os.getenv("SECRET_KEY", "CHATBOT_KEY")
 ALGORITHM = "HS256"
+ 
