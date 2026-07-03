@@ -14,11 +14,9 @@ on:
 jobs:
 
   backend:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -32,7 +30,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Verify Backend Imports
+      - name: Verify Secrets
         env:
           MONGO_URL: ${{ secrets.MONGO_URL }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -46,12 +44,18 @@ jobs:
           print("Mongo length:", len(os.getenv("MONGO_URL","")))
           print("Starts with:", os.getenv("MONGO_URL","")[:15])
           EOF
+
       - name: Verify Backend Imports
+        env:
+          MONGO_URL: ${{ secrets.MONGO_URL }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          REDIS_DB: 0
         run: |
           python -c "import app"
 
   frontend:
-
     runs-on: ubuntu-latest
 
     defaults:
@@ -59,19 +63,19 @@ jobs:
         working-directory: frontend
 
     steps:
-
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: "22"
 
-      - run: npm install
+      - name: Install Dependencies
+        run: npm install
 
-      - run: npm run build
+      - name: Build Frontend
+        run: npm run build
 
   docker:
-
     runs-on: ubuntu-latest
 
     needs:
@@ -79,7 +83,6 @@ jobs:
       - frontend
 
     steps:
-
       - uses: actions/checkout@v4
 
       - name: Build Backend Image
