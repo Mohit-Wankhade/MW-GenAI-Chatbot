@@ -46,6 +46,7 @@ jobs:
           print("Mongo length:", len(os.getenv("MONGO_URL","")))
           print("Starts with:", os.getenv("MONGO_URL","")[:15])
           EOF
+      - name: Verify Backend Imports
         run: |
           python -c "import app"
 
