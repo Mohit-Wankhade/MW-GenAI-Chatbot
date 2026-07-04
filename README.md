@@ -4,6 +4,9 @@ A production-ready Retrieval-Augmented Generation (RAG) chatbot built with FastA
 
 The application allows users to upload PDF documents or index GitHub repositories, then ask questions grounded in those sources using a hybrid retrieval pipeline and Groq LLMs.
 
+## ✨ Architecture
+
+![Architecture](assets/architecture.png)
 ---
 
 ## ✨ Features
