@@ -229,20 +229,6 @@ Metrics endpoint:
 
 ---
 
-# 📸 Screenshots
-
-Add screenshots here.
-
-Example:
-
-- Login
-- Register
-- Chat
-- Upload PDF
-- GitHub Indexing
-- Grafana Dashboard
-
----
 
 # 🚀 Future Improvements
 
