@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+
+from utils.monitoring import GITHUB_REPOS
 router = APIRouter(
     prefix="/github",
     tags=["GitHub"]
@@ -37,6 +39,7 @@ def index_github(request: GitHubRequest, current_user:str= Depends(get_current_u
         set_github_store(vector_store)
         set_github_chunks(chunks)
         save_github_chunks(chunks)
+        GITHUB_REPOS.inc()
     except Exception:
         logger.exception("GitHub indexing failed.")
         raise HTTPException(status_code=500, detail="Failed to index repository.")

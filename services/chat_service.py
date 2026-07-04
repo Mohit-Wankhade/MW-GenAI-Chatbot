@@ -10,6 +10,12 @@ from utils.guardrails import (
     validate_input,
     contains_profanity
 )
+import time
+
+from utils.monitoring import (
+    CHAT_REQUESTS,
+    CHAT_RESPONSE_TIME
+)
 from storage.vector_store_manager import (
     get_pdf_store,
     get_github_store
@@ -21,8 +27,6 @@ from db.conversation_manager import (
     save_message,
     get_messages_for_llm
 )
-
-import time
 
 client = Groq(api_key=GROQ_API_KEY)
 
@@ -153,6 +157,9 @@ def process_chat_stream(
     conversation_id=None,
     current_user=None
 ):
+    start = time.time()
+
+    CHAT_REQUESTS.inc()
 
     # -----------------------------
     # Guardrails
@@ -278,8 +285,12 @@ def process_chat_stream(
             full_response,
             formatted_sources
         )
+    
 
     except Exception:
         logger.exception("Failed to save chat after streaming")
 
     logger.info("Streaming completed")
+    CHAT_RESPONSE_TIME.observe(
+    time.time() - start
+    )
