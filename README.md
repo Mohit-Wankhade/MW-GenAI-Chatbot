@@ -1,4 +1,4 @@
-# 🚀 GenAI Chatbot
+# MW GenAI Chatbot
 
 A production-ready Retrieval-Augmented Generation (RAG) chatbot built with FastAPI and React.
 
@@ -259,7 +259,7 @@ Example:
 **Mohit Wankhade**
 
 LinkedIn:
-https://linkedin.com/in/<your-profile>
+https://www.linkedin.com/in/mohit-wankhade-a9037b205/
 
 GitHub:
-https://github.com/<your-github>
+https://github.com/Mohit-Wankhade
