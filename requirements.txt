@@ -1,38 +1,41 @@
-fastapi==0.139.0
-uvicorn[standard]==0.35.0
-prometheus-client==0.22.1
+fastapi>=0.115.0,<1.0.0
+uvicorn[standard]>=0.34.0,<1.0.0
+prometheus-client>=0.22.0,<1.0.0
 
-python-dotenv==1.2.2
-python-multipart==0.0.20
+python-dotenv>=1.0.1,<2.0.0
+python-multipart>=0.0.12,<1.0.0
 
-pydantic==2.13.4
+pydantic>=2.10.0,<3.0.0
+pydantic-settings>=2.6.0,<3.0.0
+email-validator>=2.2.0,<3.0.0
 
-pymongo==4.17.0
-redis==8.0.1
+pymongo>=4.10.0,<5.0.0
+redis>=5.2.0,<7.0.0
 
-passlib==1.7.4
-python-jose==3.5.0
-cryptography==49.0.0
+passlib[bcrypt]>=1.7.4,<2.0.0
+bcrypt>=4.0.1,<5.0.0
+python-jose[cryptography]>=3.3.0,<4.0.0
+cryptography>=43.0.0,<50.0.0
 
-groq==1.5.0
+groq>=0.13.0,<2.0.0
+requests>=2.32.0,<3.0.0
+tenacity>=9.0.0,<10.0.0
 
-langchain-community==0.4.2
-langchain-core==1.4.8
-langchain-huggingface==1.2.2
-langchain-text-splitters==1.1.2
+langchain-community>=0.3.0,<1.0.0
+langchain-core>=0.3.0,<2.0.0
+langchain-huggingface>=0.1.0,<2.0.0
+langchain-text-splitters>=0.3.0,<2.0.0
 
-sentence-transformers==5.5.1
-faiss-cpu==1.12.0
-rank-bm25==0.2.2
+sentence-transformers>=3.3.0,<6.0.0
+faiss-cpu>=1.8.0,<2.0.0
+rank-bm25>=0.2.2,<1.0.0
 
-GitPython==3.1.50
+GitPython>=3.1.43,<4.0.0
 
-PyMuPDF==1.26.4
+PyMuPDF>=1.24.0,<2.0.0
 
-better-profanity==0.7.0
+better-profanity>=0.7.0,<1.0.0
 
-numpy==2.3.2
-
-requests==2.32.5
-
-typing_extensions==4.16.0
+numpy>=1.26.0,<3.0.0
+typing_extensions>=4.12.0,<5.0.0
+orjson>=3.10.0,<4.0.0

@@ -1,52 +1,89 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-const AuthContext = createContext();
+import { clearAuthToken, getAuthToken, setAuthToken } from "../services/api";
+
+const AuthContext = createContext(null);
+
+const USERNAME_STORAGE_KEY = "username";
+
+function getStoredUsername() {
+  return localStorage.getItem(USERNAME_STORAGE_KEY);
+}
+
+function setStoredUsername(username) {
+  if (username) {
+    localStorage.setItem(USERNAME_STORAGE_KEY, username);
+  }
+}
+
+function clearStoredUsername() {
+  localStorage.removeItem(USERNAME_STORAGE_KEY);
+}
 
 export function AuthProvider({ children }) {
+  const [token, setToken] = useState(() => getAuthToken());
+  const [username, setUsername] = useState(() => getStoredUsername());
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
-    const [token, setToken] = useState(
-        localStorage.getItem("token")
-    );
-    const [username, setUsername] = useState(
-    localStorage.getItem("username")
-    );
+  useEffect(() => {
+    setIsAuthReady(true);
+  }, []);
 
-    const login = (jwt, username) => {
+  const login = useCallback((jwt, usernameValue) => {
+    if (!jwt) {
+      throw new Error("JWT token is required for login.");
+    }
 
-    localStorage.setItem("token", jwt);
-    localStorage.setItem("username", username);
-
+    setAuthToken(jwt);
     setToken(jwt);
-    setUsername(username);
 
-};
+    if (usernameValue) {
+      setStoredUsername(usernameValue);
+      setUsername(usernameValue);
+    }
+  }, []);
 
-    const logout = () => {
+  const logout = useCallback(() => {
+    clearAuthToken();
+    clearStoredUsername();
 
-        localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        setToken(null);
-        setUsername(null);
-    };
-    
+    setToken(null);
+    setUsername(null);
+  }, []);
 
-    return (
+  const updateUsername = useCallback((usernameValue) => {
+    if (!usernameValue) {
+      clearStoredUsername();
+      setUsername(null);
+      return;
+    }
 
-        <AuthContext.Provider
-            value={{
-                token,
-                login,
-                username,
-                logout
-            }}
-        
-        >
-            {children}
-        </AuthContext.Provider>
+    setStoredUsername(usernameValue);
+    setUsername(usernameValue);
+  }, []);
 
-    );
+  const value = useMemo(
+    () => ({
+      token,
+      username,
+      isAuthenticated: Boolean(token),
+      isAuthReady,
+      login,
+      logout,
+      updateUsername,
+    }),
+    [token, username, isAuthReady, login, logout, updateUsername]
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-    return useContext(AuthContext);
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider.");
+  }
+
+  return context;
 }

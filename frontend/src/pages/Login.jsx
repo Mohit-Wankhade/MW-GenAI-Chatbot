@@ -1,124 +1,150 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import AuthLayout from "../components/layout/AuthLayout";
-import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
+
+function getErrorMessage(error, fallback = "Invalid username or password.") {
+  const detail = error?.response?.data?.detail;
+
+  if (Array.isArray(detail)) {
+    return detail.map((item) => item.msg).join(", ");
+  }
+
+  if (typeof detail === "string" && detail.trim()) {
+    return detail;
+  }
+
+  if (error?.message) {
+    return error.message;
+  }
+
+  return fallback;
+}
 
 export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const navigate = useNavigate();
-    const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
-    async function handleLogin() {
-        setLoading(true);
-        setError("");
+  const redirectTo = location.state?.from?.pathname || "/chat";
 
-        try {
-            const formData = new URLSearchParams();
-            formData.append("username", username);
-            formData.append("password", password);
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/chat", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
-            const response = await api.post(
-                "/auth/login",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                }
-            );
+  async function handleLogin(event) {
+    event.preventDefault();
 
-            login(response.data.access_token, username);
-            navigate("/chat");
+    const cleanUsername = username.trim().toLowerCase();
 
-        } catch (err) {
-
-            // ✅ SAFE ERROR HANDLING (FIX)
-            let message = "Invalid username or password";
-
-            if (err?.response?.data?.detail) {
-                message = err.response.data.detail;
-            } 
-            else if (err?.message) {
-                message = err.message;
-            }
-            
-            setError(message);
-            console.log(err.response);
-
-        } finally {
-            setLoading(false);
-        }
+    if (!cleanUsername || !password) {
+      setError("Please enter both username and password.");
+      return;
     }
 
-    return (
-        <AuthLayout>
-           {/* Header */}
+    setLoading(true);
+    setError("");
 
-<div className="flex items-center justify-center gap-4 mb-8">
-    {/* Logo */}
-    <div className="w-16 h-16 rounded-2xl bg-[#C8A97E] flex items-center justify-center shadow-lg flex-shrink-0">
-        <div className="flex flex-col items-center leading-none">
-            <span className="text-2xl font-black text-black">M</span>
-            <span className="text-2xl font-black text-black -mt-3">W</span>
+    try {
+      const formData = new URLSearchParams();
+      formData.append("username", cleanUsername);
+      formData.append("password", password);
+
+      const response = await api.post("/auth/login", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      login(response.data.access_token, response.data.username || cleanUsername);
+
+      toast.success("Logged in successfully.");
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <AuthLayout>
+      <form onSubmit={handleLogin} className="w-full">
+        <div className="mb-8 flex items-center justify-center gap-4">
+          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-[#C8A97E] shadow-lg">
+            <div className="flex flex-col items-center leading-none">
+              <span className="text-2xl font-black text-black">M</span>
+              <span className="-mt-3 text-2xl font-black text-black">W</span>
+            </div>
+          </div>
+
+          <div>
+            <h1 className="text-4xl font-bold text-white">Welcome Back</h1>
+            <p className="mt-1 text-gray-400">Sign in to your AI Assistant</p>
+          </div>
         </div>
-    </div>
 
-    {/* Title */}
-    <div>
-        <h1 className="text-4xl font-bold text-white">
-            Welcome Back
-        </h1>
-        <p className="text-gray-400 mt-1">
-            Sign in to your AI Assistant
-        </p>
-    </div>
-</div>
+        <label className="mb-2 block text-sm font-medium text-gray-300">
+          Username
+        </label>
+        <input
+          className="mb-4 w-full rounded-lg bg-[#40414f] p-3 text-white outline-none ring-1 ring-transparent transition placeholder:text-gray-400 focus:ring-[#C8A97E]"
+          placeholder="Enter your username"
+          value={username}
+          autoComplete="username"
+          disabled={loading}
+          onChange={(event) => setUsername(event.target.value)}
+        />
 
-            <input
-                className="w-full p-3 rounded-lg bg-[#40414f] mb-4 outline-none text-white"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
+        <label className="mb-2 block text-sm font-medium text-gray-300">
+          Password
+        </label>
+        <input
+          className="mb-4 w-full rounded-lg bg-[#40414f] p-3 text-white outline-none ring-1 ring-transparent transition placeholder:text-gray-400 focus:ring-[#C8A97E]"
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          autoComplete="current-password"
+          disabled={loading}
+          onChange={(event) => setPassword(event.target.value)}
+        />
 
-            <input
-                className="w-full p-3 rounded-lg bg-[#40414f] mb-4 outline-none text-white"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-center text-sm font-medium text-red-300">
+            {error}
+          </div>
+        )}
 
-            {/* ✅ ERROR DISPLAY (FIXED VISIBILITY) */}
-            {error && (
-                <div className="text-red-400 mb-4 text-center font-medium bg-red-500/10 p-2 rounded-lg">
-                    {error}
-                </div>
-            )}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-lg bg-[#C8A97E] py-3 font-semibold text-[#171717] transition hover:bg-[#B7946A] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
 
-            <button
-                onClick={handleLogin}
-                disabled={loading}
-                className="w-full bg-[#C8A97E] hover:bg-[#B7946A] text-[#171717] rounded-lg py-3 font-semibold"
-            >
-                {loading ? "Logging in..." : "Login"}
-            </button>
-
-            <button
-                onClick={() => navigate("/register")}
-                className="w-full mt-3 border border-[#C8A97E] text-[#C8A97E] hover:bg-[#C8A97E] hover:text-[#171717] rounded-lg py-3 font-semibold transition"
-            >
-                Create New Account
-            </button>
-
-        </AuthLayout>
-    );
+        <div className="mt-5 text-center text-sm text-gray-400">
+          New here?{" "}
+          <Link
+            to="/register"
+            className="font-semibold text-[#C8A97E] hover:text-[#B7946A]"
+          >
+            Create an account
+          </Link>
+        </div>
+      </form>
+    </AuthLayout>
+  );
 }

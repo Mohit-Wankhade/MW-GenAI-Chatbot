@@ -1,23 +1,23 @@
-export default function ThinkingIndicator() {
+export default function ThinkingIndicator({ label = "Thinking", compact = false }) {
+  return (
+    <div className={`flex items-center gap-2 ${compact ? "px-0 py-0" : "px-2 py-1"}`}>
+      <div className="flex items-center gap-1">
+        <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400" />
+        <span
+          className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+          style={{ animationDelay: "0.15s" }}
+        />
+        <span
+          className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+          style={{ animationDelay: "0.3s" }}
+        />
+      </div>
 
-    return (
-
-        <div className="flex gap-1 items-center px-2 py-1">
-
-            <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></span>
-
-            <span
-                className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
-                style={{ animationDelay: "0.15s" }}
-            ></span>
-
-            <span
-                className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
-                style={{ animationDelay: "0.3s" }}
-            ></span>
-
-        </div>
-
-    );
-
+      {label && (
+        <span className="text-sm text-gray-300">
+          {label}
+        </span>
+      )}
+    </div>
+  );
 }

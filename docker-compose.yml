@@ -1,103 +1,133 @@
-
 services:
-
   backend:
     build:
       context: .
       dockerfile: Dockerfile
-
-    container_name: backend
-
-    ports:
-      - "8000:8000"
-
+    container_name: genai-chatbot-backend
     env_file:
       - .env
-
+    environment:
+      APP_ENV: production
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+    ports:
+      - "8000:8000"
     depends_on:
-      - redis
-
+      redis:
+        condition: service_healthy
     volumes:
       - ./storage:/app/storage
       - ./repos:/app/repos
-
+      - ./logs:/app/logs
     restart: unless-stopped
-
+    networks:
+      - chatbot-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 5
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-
-    container_name: frontend
-
+    container_name: genai-chatbot-frontend
+    restart: unless-stopped
     ports:
       - "3000:80"
-
-    depends_on:
-      - backend
-
-    restart: unless-stopped
-
+    networks:
+      - chatbot-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
 
   redis:
     image: redis:7-alpine
-
-    container_name: redis
-
+    container_name: genai-chatbot-redis
+    command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
-
-    restart: unless-stopped
-
     volumes:
       - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - chatbot-net
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   nginx:
-    build: ./nginx
-
-    container_name: nginx
-
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: genai-chatbot-nginx
     ports:
-    - "80:80"
-
+      - "80:80"
     depends_on:
-    - frontend
-    - backend
-
-  
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - chatbot-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 5
 
   prometheus:
-    image: prom/prometheus
-
-    container_name: prometheus
-
+    image: prom/prometheus:v2.55.1
+    container_name: genai-chatbot-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
     ports:
       - "9090:9090"
-
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - chatbot-net
 
   grafana:
-    image: grafana/grafana
-
-    container_name: grafana
-
+    image: grafana/grafana:11.4.0
+    container_name: genai-chatbot-grafana
     ports:
       - "3001:3000"
-
-    depends_on:
-      - prometheus
-
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
       - grafana-storage:/var/lib/grafana
-
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - chatbot-net
 
 volumes:
-  grafana-storage:
   redis-data:
+  prometheus-data:
+  grafana-storage:
 
-restart: unless-stopped
+networks:
+  chatbot-net:
+    driver: bridge

@@ -1,34 +1,49 @@
-# Python
-venv/
-__pycache__/
-*.pyc
-
 # Environment
 .env
+.env.*
+!.env.example
+
+# Python
+venv/
+env/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # Logs
 logs/
+*.log
 
-# Indexes
-storage/github_index/
-storage/pdf_index/
-storage/github_chunks.pkl
-storage/pdf_chunks.pkl
-
-# Uploaded files
+# Runtime storage
 storage/uploads/
-
-# Repositories downloaded
+storage/pdf_index/
+storage/github_index/
 repos/
 
-# Node
+# Frontend
 frontend/node_modules/
-
-# React build
 frontend/dist/
+frontend/.vite/
 
-# VS Code
-.vscode/
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Mac
+# OS
 .DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Keep sample PDFs
+!samples/*.pdf
+!samples/*.txt
