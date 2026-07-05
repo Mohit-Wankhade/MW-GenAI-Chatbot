@@ -375,7 +375,7 @@ The recommended deployment order is:
 Current Oracle Cloud public IP:
 
 ```txt
-92.4.93.156
+129.154.247.177
 ```
 
 ### 1. SSH into the VM
@@ -415,7 +415,7 @@ REDIS_DB=0
 SECRET_KEY=replace_with_a_strong_secret_key
 ALGORITHM=HS256
 
-CORS_ORIGINS=http://92.4.93.156
+CORS_ORIGINS=http://129.154.247.177
 ```
 
 ### 4. Prepare runtime folders
@@ -446,7 +446,8 @@ docker compose logs -f backend
 ### 8. Access the app
 
 ```txt
-http://92.4.93.156
+http://129.154.247.177
+
 ```
 
 ---
