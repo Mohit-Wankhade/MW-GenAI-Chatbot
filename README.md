@@ -149,6 +149,10 @@ Chatbot/
 ├── README.md
 ├── assets/
 │   └── architecture.png
+├── samples/
+│   ├── sample.pdf
+│   ├── sample2.pdf
+│   └── sample_github_repo.txt
 ├── auth/
 ├── cache/
 ├── db/
@@ -187,6 +191,7 @@ ALGORITHM=HS256
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost,http://127.0.0.1:5173,http://127.0.0.1:3000
 ```
 
+Do not commit your `.env` file to GitHub.
 
 ---
 
@@ -195,25 +200,32 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost,http:/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Mohit-Wankhade/GenAI-Chatbot.git
-cd GenAI-Chatbot
+git clone https://github.com/Mohit-Wankhade/MW-GenAI-Chatbot.git
+cd MW-GenAI-Chatbot
 ```
 
 ### 2. Start the full stack using Docker Compose
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
-### 3. Open the application
+### 3. Check running containers
 
-| Service      | URL                        |
-| ------------ | -------------------------- |
-| Frontend     | http://localhost           |
-| Backend API  | http://localhost:8000      |
-| Swagger Docs | http://localhost:8000/docs |
-| Prometheus   | http://localhost:9090      |
-| Grafana      | http://localhost:3001      |
+```bash
+docker compose ps
+```
+
+### 4. Open the application
+
+| Service                 | URL                        |
+| ----------------------- | -------------------------- |
+| Main App through Nginx  | http://localhost           |
+| Frontend container only | http://localhost:3000      |
+| Backend API             | http://localhost:8000      |
+| Swagger Docs            | http://localhost:8000/docs |
+| Prometheus              | http://localhost:9090      |
+| Grafana                 | http://localhost:3001      |
 
 Default Grafana login, if unchanged:
 
@@ -295,6 +307,31 @@ docker compose down
 
 ---
 
+## Sample Files
+
+This repository includes two sample PDFs for testing the PDF RAG pipeline and one text file containing sample GitHub repositories.
+
+```txt
+samples/sample.pdf
+samples/sample2.pdf
+samples/sample_github_repo.txt
+```
+
+You can upload the PDFs through the application UI to test:
+
+* PDF extraction
+* Chunking
+* FAISS indexing
+* BM25 retrieval
+* Cross-Encoder reranking
+* Source attribution
+
+You can use `samples/sample_github_repo.txt` to quickly test GitHub repository indexing.
+
+Runtime uploaded files are stored inside `storage/uploads/` and are intentionally ignored from Git.
+
+---
+
 ## GitHub Update Flow
 
 After local testing works successfully:
@@ -302,9 +339,17 @@ After local testing works successfully:
 ```bash
 git status
 git add .
-git commit -m "Improve production-ready RAG chatbot architecture"
+git commit -m "Finalize MW GenAI Chatbot"
 git push origin main
 ```
+
+If the remote GitHub repository has an older default README and you want to overwrite it with this local project:
+
+```bash
+git push -u origin main --force
+```
+
+Use force push only when the remote repository does not contain anything important.
 
 ---
 
@@ -319,7 +364,7 @@ The recommended deployment order is:
 5. Clone the repository on the VM
 6. Create the production `.env` file
 7. Start containers using Docker Compose
-8. Open firewall/security list ports
+8. Open required firewall/security list ports
 9. Access the app using the VM public IP
 10. Optionally attach a domain and enable HTTPS
 
@@ -327,17 +372,23 @@ The recommended deployment order is:
 
 ## Oracle Cloud Deployment
 
+Current Oracle Cloud public IP:
+
+```txt
+92.4.93.156
+```
+
 ### 1. SSH into the VM
 
 ```bash
-ssh -i /path/to/private-key.key ubuntu@your_public_ip
+ssh -i /path/to/private-key.key ubuntu@92.4.93.156
 ```
 
 ### 2. Clone the repository
 
 ```bash
-git clone https://github.com/Mohit-Wankhade/GenAI-Chatbot.git
-cd GenAI-Chatbot
+git clone https://github.com/Mohit-Wankhade/MW-GenAI-Chatbot.git
+cd MW-GenAI-Chatbot
 ```
 
 ### 3. Create `.env`
@@ -364,7 +415,7 @@ REDIS_DB=0
 SECRET_KEY=replace_with_a_strong_secret_key
 ALGORITHM=HS256
 
-CORS_ORIGINS=http://your_public_ip
+CORS_ORIGINS=http://92.4.93.156
 ```
 
 ### 4. Prepare runtime folders
@@ -395,8 +446,24 @@ docker compose logs -f backend
 ### 8. Access the app
 
 ```txt
-http://your_public_ip
+http://92.4.93.156
 ```
+
+---
+
+## Required Oracle Cloud Ports
+
+Open these ports in the Oracle Cloud security list or network security group:
+
+| Port | Purpose                             |
+| ---- | ----------------------------------- |
+| 22   | SSH                                 |
+| 80   | Main application through Nginx      |
+| 8000 | Backend API, optional for debugging |
+| 9090 | Prometheus, optional                |
+| 3001 | Grafana, optional                   |
+
+For production, expose only port `80` publicly and restrict monitoring ports if possible.
 
 ---
 
@@ -495,21 +562,10 @@ Recommended future security improvements:
 
 ---
 
-## Sample Files
-
-This repository includes two sample PDFs for testing the PDF RAG pipeline and 1 txt file having sample github repos:
-
-```txt
-samples/sample.pdf
-samples/sample2.pdf
-samples/sample_github_repo.txt
-
----
-
 ## Future Improvements
 
 * HTTPS with domain support
-* Server-Sent Events for cleaner streaming
+* Cleaner Server-Sent Events streaming
 * Per-user isolated vector indexes
 * Background indexing jobs
 * Document deletion and reindexing
@@ -551,5 +607,3 @@ https://www.linkedin.com/in/mohit-wankhade-a9037b205/
 
 GitHub:
 https://github.com/Mohit-Wankhade
-
-
