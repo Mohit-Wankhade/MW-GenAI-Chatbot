@@ -36,6 +36,13 @@ The application allows authenticated users to upload PDF documents or index publ
 
 |![RAG Response](assets/screenshots/response.png) |
 
+### Monitoring
+
+| Prometheus | Grafana |
+|---|---|
+| ![Prometheus](assets/screenshots/prometheus.png) | ![Grafana](assets/screenshots/grafana.png) |
+
+
 ---
 
 ## High-Level Flow
